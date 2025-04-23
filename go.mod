@@ -1,4 +1,4 @@
-module github.com/Innerworks-me/go-cached-database
+module github.com/InnerWorks-me/go-cached-database
 
 go 1.23.7
 

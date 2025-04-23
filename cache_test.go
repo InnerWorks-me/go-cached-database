@@ -3,7 +3,7 @@ package cacheddatabase
 import (
 	"context"
 	"fmt"
-	"github.com/Innerworks-me/go-cached-database/queries_test"
+	"github.com/InnerWorks-me/go-cached-database/queries_test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
