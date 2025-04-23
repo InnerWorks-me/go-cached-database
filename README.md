@@ -144,7 +144,7 @@ In order to cache a query result, you must specify a unique identifier that will
 ```go
 authorId := 1
 cacheKey := fmt.Sprintf("author:%d", authorId)
-author, err := WithCache(&adapter, cacheKey, func() (queries_test.Author, error) {
+author, err := WithCache(adapter, cacheKey, func() (queries_test.Author, error) {
     return adapter.Queries.GetAuthor(ctx, newAuthor.ID)
 })
 ```
