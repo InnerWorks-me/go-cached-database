@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
+	"net/url"
 	"time"
 )
 
@@ -52,15 +53,23 @@ func NewAdapter[T any](config Config[T]) (*Adapter[T], error) {
 		DB:       config.Redis.Database,
 	})
 
-	connStr := fmt.Sprintf("postgresql://%s:%s@%s/%s",
-		config.Postgres.User,
-		config.Postgres.Password,
+	connStr := fmt.Sprintf("postgresql://%s/%s",
 		config.Postgres.Endpoint,
 		config.Postgres.Database,
 	)
 
+	connUrl, err := url.Parse(connStr)
+	if err != nil {
+		return nil, err
+	}
+
+	// Properly encode/escape database username and password into the connection URL
+	if config.Postgres.User != "" && config.Postgres.Password != "" {
+		connUrl.User = url.UserPassword(config.Postgres.User, config.Postgres.Password)
+	}
+
 	ctx := context.Background()
-	psqlConn, err := pgxpool.New(ctx, connStr)
+	psqlConn, err := pgxpool.New(ctx, connUrl.String())
 	if err != nil {
 		return nil, err
 	}
