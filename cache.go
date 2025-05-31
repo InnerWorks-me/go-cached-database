@@ -44,6 +44,9 @@ func retrieveAndCache[T, U any](cda *Adapter[T], key string, retrieveFn func() (
 	go func() {
 		asStr, err := json.Marshal(resultFromDb)
 		if err == nil {
+			if string(asStr) == "null" || string(asStr) == "" {
+				return // Skip caching for empty or null values
+			}
 			go cda.redisClient.Set(ctx, key, asStr, cda.cacheTTL)
 		}
 
