@@ -54,3 +54,8 @@ func retrieveAndCache[T, U any](cda *Adapter[T], key string, retrieveFn func() (
 
 	return resultFromDb, nil
 }
+
+func Invalidate[T any](cda *Adapter[T], keys ...string) error {
+	cmd := cda.redisClient.Del(context.Background(), keys...)
+	return cmd.Err()
+}
