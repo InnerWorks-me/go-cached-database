@@ -69,7 +69,16 @@ func NewAdapter[T any](config Config[T]) (*Adapter[T], error) {
 	}
 
 	ctx := context.Background()
-	psqlConn, err := pgxpool.New(ctx, connUrl.String())
+	pgxConfig, err := pgxpool.ParseConfig(connUrl.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse postgres config: %w", err)
+	}
+	// Avoid "prepared statement already in use" (SQLSTATE 08P01) when pgxpool
+	// reuses a connection through PgBouncer transaction pooling. SimpleProtocol
+	// skips named Parse messages entirely, so no statement name collisions occur.
+	pgxConfig.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
+
+	psqlConn, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
 		return nil, err
 	}
